@@ -1,132 +1,178 @@
-# Oodi — Secure Starter Kit (v0.3.0)
+# Oodi — Secure Starter (Beta) — راهنمای کامل (فارسی)
 
-این بسته یک نسخهٔ ارتقا یافته و کامل از پروتوتایپ زبان **Oodi** است — زبانی که با هدف ساده‌سازی و افزایش امنیت در استفاده از secretها (مثل API keys) ساخته شده است.
-
-نسخهٔ حاضر شامل:
-- گرامر ساده‌ی Oodi (PEG.js)
-- Transpiler ساده (Oodi -> JavaScript)
-- Runtime برای درخواست توکن و کال امن (`__getSecret`, `__call`, `setAuthToken`)
-- سرور نمونه: احراز هویت کاربر، تولید توکن کوتاه‌مدت، پراکسی امن (`/api/proxy/ai`)
-- Mock AI external endpoint برای تست
-- مثال‌ها: `ai_full.oodi`, `todo.oodi`
-- صفحات وب نمونه برای تست در مرورگر
-- اسکریپت‌های npm برای build و اجرا
+**تذکر مهم:** این نسخه در مرحلهٔ **Beta** است. پروژه نمونه و پروتوتایپ بوده و هنوز روی بخش‌های امنیتی، تست و performance کار کامل نشده.  
+استفاده در production بدون بازبینی و تقویت امنیتی **توصیه نمی‌شود**.
 
 ---
 
-## شروع سریع (Quick Start)
+## معرفی کوتاه
+Oodi یک زبان/DSL سبک است که روی JavaScript ساخته شده — هدفش ساده‌سازی و امن‌کردن الگوهای استفاده از `secret` (مثل API keys) در فرانت‌اند است.  
+این بسته شامل یک پیاده‌سازی نمونه (گرامر ساده، transpiler، runtime) و یک **سرور نمونه امن** (تولید توکن کوتاه‌مدت و پراکسی) و صفحات وب دمو می‌باشد.
 
-1. اکسترکت بسته و وارد پوشه شو:
+---
+
+## وضعیت نسخه
+- نسخه: **v0.3.0 (Beta)**
+- وضعیت: **نمونهٔ کاری** — مناسب برای یادگیری، تست محلی و پروتوتایپ.  
+- موارد مهم: ممکن است APIها تغییر کنند، گرامر کامل نیست، و ویژگی‌های production مانند ذخیرهٔ jti در Redis، HTTPS خودکار، و auditها هنوز اضافه نشده‌اند.
+
+---
+
+## آنچه در این بسته می‌یابید
+- `src/` — گرامر (PEG.js)، compiler و runtime
+- `src/examples/` — مثال‌های Oodi (`ai_full.oodi`, `todo.oodi`)
+- `out-*.js` — خروجی‌های کامپایل‌شده آماده (برای اجرا بدون کامپایل)
+- `server/` — سرور نمونه (login, get-secret-token, proxy, mock AI)
+- `web/` — صفحات دمو (`ai.html`, `todo.html`)
+- `README.md` — همین فایل
+- اسکریپت‌های npm: `npm run build`, `npm run start-server`
+
+---
+
+## پیش‌نیازها (Prerequisites)
+1. Node.js >= 18 (تست شده با Node 20)  
+2. npm (همراه Node)  
+3. Git (برای کلون کردن اگر لازم)  
+4. (اختیاری) `npx serve` برای سرو کردن پوشهٔ `web/` یا هر static server
+
+---
+
+## نصب و راه‌اندازی (Step-by-step)
+1. مخزن را کلون یا ZIP را استخراج کن:
 ```bash
-cd oodi-starter-secure-v2
+git clone https://github.com/Osodyssey/oodi-os.git
+cd oodi-os
+```
+
+2. نصب وابستگی‌ها:
+```bash
 npm install
 ```
 
-2. یک فایل `.env` در فولدر `server/` بساز (از `.env.example` کپی کن) و مقادیر را وارد کن:
+3. تنظیم متغیرهای محیطی:
+```bash
+cd server
+cp .env.example .env
+# ویرایش .env در صورت نیاز؛ برای دمو از مقادیر پیش‌فرض استفاده کن
 ```
-SERVER_JWT_SECRET=your_server_secret_here
-AI_KEY=sk_ai_demo_value
+
+مقدار پیشنهادی `.env` برای تست سریع:
+```
+SERVER_JWT_SECRET=dev-secret
+AI_KEY=sk_ai_demo
 ALLOWED_ORIGIN=http://localhost:5000
 ALICE_PW=password
 BOB_PW=hunter2
+DEMO_MODE=true
 ```
 
-3. سرور را اجرا کن:
+4. اجرای سرور:
 ```bash
+cd ..
 npm run start-server
 ```
+- خروجی باید شبیه باشد: `Secure Oodi server running on 3000 DEMO_MODE=true`
 
-4. در پنجرهٔ دیگری کدهای Oodi را کامپایل کن (مثال AI):
+5. کامپایل مثال‌ها (Oodi → JS):
 ```bash
-npm run build
+# AI example
+node src/cli.js build src/examples/ai_full.oodi -o web/out-ai.js
+
+# ToDo example
+node src/cli.js build src/examples/todo.oodi -o web/out-todo.js
 ```
 
-5. صفحهٔ وب نمونه را باز کن:
-- ساده‌ترین راه: اجرا `npx serve web` یا باز کردن فایل `web/ai.html` در مرورگر.
-- آدرس پیش‌فرض سرور: `http://localhost:3000`
+6. سرو کردن صفحه‌های وب و تست:
+```bash
+npx serve web
+# سپس در مرورگر برو به http://localhost:5000/ai.html
+```
 
-6. لاگین کن (مثال): username=`alice`, password=`password`  
-سپس `Ask` را امتحان کن.
-
----
-
-## فایل‌های مهم
-
-- `src/grammar.pegjs` — گرامر زبان Oodi
-- `src/compiler.js` — Transpiler ساده
-- `src/cli.js` — CLI برای build
-- `src/runtime/oodi-runtime.js` — runtime client
-- `src/examples/ai_full.oodi` — مثال AI
-- `src/examples/todo.oodi` — مثال ToDo
-- `out-ai.js` / `out-todo.js` — خروجی کامپایل‌شده (برای اجرا بدون نیاز به کامپایل)
-- `server/index.js` — سرور نمونه با احراز هویت و پراکسی
-- `web/ai.html` / `web/todo.html` — صفحات نمونه
+- اگر `DEMO_MODE=true` باشد، صفحه AI بدون نیاز به لاگین کار می‌کند (فقط برای دمو).
+- اگر `DEMO_MODE=false` باید با کاربر `alice/password` لاگین کنی.
 
 ---
 
-## مدل امنیتی بدیهی
+## چطور از زبان Oodi استفاده کنم؟ (Short)
+1. یک فایل `.oodi` بنویس (مثال: `src/examples/ai_full.oodi`).
+2. با CLI کامپایل کن:
+```bash
+node src/cli.js build path/to/file.oodi -o out-file.js
+```
+3. فایل JS خروجی را در HTML وارد کن یا در Node اجرا کن.  
+4. در runtime با `setAuthToken(jwt)` توکن کاربر را ست کن تا `__getSecret` اجازه بگیرد.
 
-- کلیدهای حقیقی (`AI_KEY`, ...) فقط روی سرور ذخیره می‌شوند.
-- کلاینت هیچ‌گاه کلید اصلی را نمی‌بیند. به جای آن توکن‌های کوتاه‌مدت (JWT) صادر می‌شود.
-- توکن‌ها دارای `jti`, `scope`, `exp` هستند و می‌توانند یک‌بار مصرف شوند.
-- برای production از HTTPS، Vault و cache/DB (مثل Redis) برای jti و rate-limit استفاده کن.
+---
+
+## ارورهای شایع و راه‌حل‌ها (Troubleshooting)
+> اگر خطا دیدی اول این بخش را چک کن — ۹۹٪ مشکل راه‌حلش اینجا هست.
+
+### 1) `Error: ENOENT: no such file or directory, open 'src/grammar.pegjs'`
+- دلیل: فایل گرامر پیدا نشد.
+- راه‌حل:
+  - مطمئن شو کل فایل‌ها را از ZIP یا گیت استخراج کردی. فایل `src/grammar.pegjs` باید وجود داشته باشد.
+  - اگر از repo دیگری clone کردی و این فایل نبود، از نسخه‌ی ZIP ما استفاده کن.
+
+### 2) `404 Not Found` برای `out-ai.js` یا `out-todo.js`
+- دلیل: فایل‌های خروجی JS تولید نشده یا در مسیر درست نیستند.
+- راه‌حل:
+  - مطمئن شو دستور build را اجرا کردی (نمونه در بالا).
+  - یا خروجی را مستقیم در پوشهٔ `web/` بگذار: `-o web/out-ai.js`.
+
+### 3) CORS یا درخواست‌ها در مرورگر بلاک میشه
+- دلیل: درخواست‌های cross-origin یا هدرها مشکل دارند.
+- راه‌حل:
+  - فایل `server/.env` مقدار `ALLOWED_ORIGIN` را برای آدرسی که `npx serve` استفاده می‌کند قرار بده.
+  - یا برای تست محلی `ALLOWED_ORIGIN=*` (فقط تست).
+
+### 4) `token expired or replayed` یا خطای JWT
+- دلیل: توکن کوتاه‌مدت (jti) یا توکن کاربر منقضی شده یا دوباره استفاده شده.
+- راه‌حل:
+  - دوباره لاگین کن و عملیات را تکرار کن.
+  - زمان سیستم را بررسی کن؛ اگر ساعت سیستم اشتباه باشه توکن‌ها ممکنه فوراً expire شوند.
+
+### 5) `port already in use` یا سرور استارت نمیشه
+- راه‌حل:
+  - فرایند دیگری روی پورت 3000 اجرا شده؛ یا از `PORT` محیطی دیگر استفاده کن:
+  ```bash
+  PORT=4000 npm run start-server
+  ```
+
+### 6) `npm install` خطا داد یا پکیج نصب نشد
+- راه‌حل:
+  - مطمئن شو Node.js نسخه >= 18 دارید (`node -v`).
+  - `npm cache clean --force` و دوباره `npm install`.
+  - در صورت خطاهای native build، متن ارور را ذخیره کن و ارسال کن تا راهنمایی کنم.
 
 ---
 
-## چگونه Oodi کار می‌کند (خلاصه تکنیکی)
-
-1. کاربر login می‌کند و JWT کاربر را دریافت می‌کند.
-2. runtime با `setAuthToken(jwt)` هدر Authorization را برای درخواست‌های بعدی قرار می‌دهد.
-3. وقتی در کد Oodi `secret ai` فراخوانی می‌شود، runtime `/api/get-secret-token` را صدا می‌زند تا توکن کوتاه‌مدت بگیرد.
-4. کد خروجی JS توکن را همراه با `call "/api/proxy/ai"` به پراکسی می‌فرستد.
-5. سرور پراکسی توکن را verify کرده و با کلید داخلی به سرویس خارجی (در این نسخه یک Mock) متصل می‌شود.
+## نکات امنیتی مهم (Security)
+- **هرگز** `DEMO_MODE=true` را در محیط عمومی یا سرور تولیدی قرار نده.
+- کلیدهای واقعی (`AI_KEY`) را در repo قرار نده؛ از `.env` یا Vault استفاده کن.
+- برای production:
+  - HTTPS را فعال کن (Let's Encrypt یا certs محلی برای تست).
+  - jtiها و sessionها را در Redis یا DB ذخیره کن (نه در حافظهٔ محلی).
+  - rate-limit تنظیم کن و logging/alert اضافه کن.
+  - بررسی و Audit امنیتی قبل از انتشار.
 
 ---
-# Oodi — Secure Starter Kit (Updated Files)
 
-این بسته شامل فایل‌های به‌روزرسانی شده برای نسخهٔ Secure Oodi است.  
-فقط فایل‌هایی که تغییر کرده‌اند داخل این ZIP قرار دارند — برای به‌روزرسانی پروژهٔ اصلی، این فایل‌ها را با فایل‌های مشابه در پروژه جایگزین کنید.
+## اگر باز هم خطا داشتی چی کار کنی؟
+1. لاگ‌ها را کپی کن (هم terminal سرور و هم کنسول مرورگر).  
+2. `node -v` و `npm -v` را بفرست.  
+3. بگو چه فرمانی زدی و چه پیغامی آمد.  
+4. من دقیقاً خط به خط می‌گم چه تغییری بدی.
 
-----
-## Included files (فایل‌های موجود)
-- server/index.js         — اضافه شدن DEMO_MODE، endpoint `/api/status` و پشتیبانی از حالت دمو
-- server/.env.example     — متغیر محیطی جدید: DEMO_MODE
-- web/ai.html             — شناسایی خودکار حالت دمو، رابط کاربری که در دمو نیازی به login ندارد
-- README.md               — این فایل — راهنمای انگلیسی و فارسی برای روش استفاده و نکات امنیتی
+---
 
-----
-## Quick explanation (English)
-This update makes it easier to demo Oodi without going through the full login/token flow:
-- `DEMO_MODE=true` in the server `.env` enables demo behavior.
-- When demo mode is enabled, `/api/status` returns `{ demo: true }`.
-- The web client (`web/ai.html`) queries `/api/status` and if demo is enabled it will hide the login UI and allow asking AI directly.
-- The server will **only for demo** allow `/api/proxy/ai` calls without a short-lived token (still uses server-side AI key).
-- **Security note:** Demo mode is for local testing only. DO NOT enable DEMO_MODE in production or any public environment.
+## چک‌لیست قبل از انتشار (Quick checklist)
+- [ ] غیرفعال کردن `DEMO_MODE`
+- [ ] استفاده از HTTPS
+- [ ] انتقال jti/session به Redis
+- [ ] بررسی لاگ‌ها و حذف اطلاعات حساس
+- [ ] اجرای تست‌های نفوذ و بررسی rate-limit
 
-----
-## توضیحات کامل (فارسی)
-این به‌روزرسانی‌ها برای راحتیِ دمو و توسعه محلی اضافه شده‌اند:
-- متغیر محیطی `DEMO_MODE` اضافه شد. اگر مقدار آن `true` باشد، سرور حالت دمو را فعال می‌کند.
-- `/api/status` به کلاینت امکان می‌دهد تا بداند سرور در حالت دمو است یا خیر.
-- اگر دمو فعال باشد، صفحهٔ `web/ai.html` لاگین را پنهان کرده و امکان ارسال prompt به AI را بدون لاگین فراهم می‌کند (برای تست سریع).
-- در حالت دمو، سرور به `/api/proxy/ai` اجازه می‌دهد بدون توکن کوتاه‌مدت درخواست کند — این فقط برای تسهیل دمو است و امنیت کمتری دارد.
+---
 
-----
-## How to apply (چگونه استفاده کنیم)
-1. unzip this archive into your project root (replace files if prompted).
-2. edit `server/.env` and set `DEMO_MODE=true` for local testing.
-3. start the server: `npm run start-server`
-4. build oodi examples if you need: `npm run build`
-5. serve `web/` directory (e.g. `npx serve web`) and open `web/ai.html`
-6. In demo mode you can immediately enter a prompt and press Ask; in non-demo mode you must login first.
-
-----
-## Security reminder / هشدار امنیتی
-- Demo mode bypasses normal token checks. Do not set `DEMO_MODE=true` on public servers.
-- Always keep real API keys (AI_KEY) in server environment and never commit them.
-- For production, use HTTPS, strong auth, and store jti / token state in Redis or DB.
-
-----
-## Contact / ارتباط
-- Project: Oodi — Secure starter
-- If you want, I can apply these updates directly into your full project ZIP or run the server locally on your machine step-by-step.
+## لیسانس و مشارکت
+این پروژه تحت **MIT** یا هر لیسانسی که در repo قرار دارد منتشر می‌شود. مشارکت خوش‌آمد است — Pull Request بده و ویژگی‌ها یا باگ‌ها را گزارش کن.
