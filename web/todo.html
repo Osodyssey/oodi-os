@@ -1,0 +1,25 @@
+<!doctype html>
+<html>
+  <head><meta charset="utf-8"><title>Oodi ToDo Demo</title></head>
+  <body>
+    <h2>ToDo</h2>
+    <input id="task" placeholder="New task">
+    <button id="addBtn">Add</button>
+    <button id="listBtn">List</button>
+    <pre id="output"></pre>
+
+    <script type="module">
+      import { addTask, listTasks } from '../out-todo.js';
+
+      document.getElementById('addBtn').onclick = async ()=>{
+        const t = document.getElementById('task').value;
+        await addTask(t);
+        alert('added');
+      };
+      document.getElementById('listBtn').onclick = async ()=>{
+        const r = await listTasks();
+        document.getElementById('output').innerText = JSON.stringify(r, null, 2);
+      };
+    </script>
+  </body>
+</html>
