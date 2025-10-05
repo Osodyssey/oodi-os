@@ -82,10 +82,3 @@ npm run build
 5. سرور پراکسی توکن را verify کرده و با کلید داخلی به سرویس خارجی (در این نسخه یک Mock) متصل می‌شود.
 
 ---
-
-## توسعه و گسترش
-
-- می‌تونی grammar را گسترش دهی و ویژگی‌هایی مثل `import/export`, `let`, `const`, `return` و type hints اضافه کنی.
-- برای production: استفاده از esbuild plugin یا Babel plugin، source-map، تست‌ها و CI را اضافه کن.
-
----
