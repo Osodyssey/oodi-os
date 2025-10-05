@@ -1,16 +1,23 @@
 // oodi-runtime.js
-// runtime supports setting a client auth token for server requests
 export function setAuthToken(token) {
   if (typeof window !== 'undefined') {
     window.__oodi_auth_token = token;
+  } else {
+    global.__oodi_auth_token = token;
   }
 }
 
-export async function __getSecret(name) {
-  const headers = { 'Content-Type': 'application/json' };
+async function getAuthHeader() {
   if (typeof window !== 'undefined' && window.__oodi_auth_token) {
-    headers['Authorization'] = 'Bearer ' + window.__oodi_auth_token;
+    return { Authorization: 'Bearer ' + window.__oodi_auth_token };
+  } else if (typeof global !== 'undefined' && global.__oodi_auth_token) {
+    return { Authorization: 'Bearer ' + global.__oodi_auth_token };
   }
+  return {};
+}
+
+export async function __getSecret(name) {
+  const headers = { 'Content-Type': 'application/json', ...(await getAuthHeader()) };
   const res = await fetch('/api/get-secret-token', {
     method: 'POST',
     credentials: 'include',
@@ -26,10 +33,7 @@ export async function __getSecret(name) {
 }
 
 export async function __call(endpoint, data) {
-  const headers = { 'Content-Type': 'application/json' };
-  if (typeof window !== 'undefined' && window.__oodi_auth_token) {
-    headers['Authorization'] = 'Bearer ' + window.__oodi_auth_token;
-  }
+  const headers = { 'Content-Type': 'application/json', ...(await getAuthHeader()) };
   const res = await fetch(endpoint, {
     method: 'POST',
     credentials: 'include',
