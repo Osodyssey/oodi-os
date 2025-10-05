@@ -1,0 +1,7 @@
+{
+  "files.exclude": {
+    "node_modules": true,
+    "out-*.js": true
+  },
+  "editor.formatOnSave": true
+}
