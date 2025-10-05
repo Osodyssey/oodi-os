@@ -1,0 +1,19 @@
+{
+  "name": "oodi-starter-secure",
+  "version": "0.2.0",
+  "type": "module",
+  "scripts": {
+    "build": "node src/cli.js build src/examples/app.oodi -o out.js",
+    "start-server": "node server/index.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "dotenv": "^16.0.3",
+    "jsonwebtoken": "^9.0.0",
+    "pegjs": "^0.10.0",
+    "minimist": "^1.2.7",
+    "express-rate-limit": "^6.7.0",
+    "helmet": "^7.0.0",
+    "cors": "^2.8.5"
+  }
+}
