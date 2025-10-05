@@ -1,0 +1,39 @@
+<!doctype html>
+<html>
+  <head><meta charset="utf-8"><title>Oodi AI Demo</title></head>
+  <body>
+    <h2>Login</h2>
+    <input id="user" placeholder="username" value="alice">
+    <input id="pw" placeholder="password" value="password" type="password">
+    <button id="loginBtn">Login</button>
+    <p id="status"></p>
+
+    <h2>Ask AI</h2>
+    <input id="prompt" placeholder="Prompt برای AI" style="width:60%">
+    <button id="askBtn">Ask</button>
+    <pre id="output"></pre>
+
+    <script type="module">
+      import { setAuthToken } from '../src/runtime/oodi-runtime.js';
+      import { askAI } from '../out-ai.js';
+
+      document.getElementById('loginBtn').onclick = async ()=>{
+        const user = document.getElementById('user').value;
+        const pw = document.getElementById('pw').value;
+        const res = await fetch('/api/login',{ method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({username:user,password:pw}) });
+        if(!res.ok){ document.getElementById('status').innerText='Login failed'; return; }
+        const { token } = await res.json();
+        setAuthToken(token);
+        document.getElementById('status').innerText='Logged in as '+user;
+      };
+
+      document.getElementById('askBtn').onclick = async ()=>{
+        const prompt = document.getElementById('prompt').value;
+        try{
+          const r = await askAI(prompt);
+          document.getElementById('output').innerText = JSON.stringify(r, null, 2);
+        }catch(e){document.getElementById('output').innerText = e.message;}
+      };
+    </script>
+  </body>
+</html>
