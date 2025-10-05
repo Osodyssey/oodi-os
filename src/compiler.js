@@ -1,11 +1,12 @@
 import fs from 'fs';
 import peg from 'pegjs';
+import path from 'path';
 
-const grammar = fs.readFileSync(new URL('./grammar.pegjs', import.meta.url), 'utf8');
+const grammarPath = new URL('./grammar.pegjs', import.meta.url);
+const grammar = fs.readFileSync(grammarPath, 'utf8');
 const parser = peg.generate(grammar);
 
 function lint(code) {
-  // simple heuristics: warn if console.log or JSON.stringify used with secret name
   const warnings = [];
   const secretRegex = /secret\s+([a-zA-Z_$][a-zA-Z0-9_$]*)/g;
   const secrets = [];
@@ -39,7 +40,6 @@ export function compile(code) {
       case 'Program':
         return node.body.map(gen).join('\n');
       case 'SecretDeclaration':
-        // secret name = "stripe"  -> const name = async () => __getSecret("name");
         return `const ${node.name} = async () => __getSecret(${JSON.stringify(node.name)});`;
       case 'FunctionDeclaration':
         const params = node.params.join(', ');
@@ -48,7 +48,7 @@ export function compile(code) {
       case 'ExpressionStatement':
         return gen(node.expression) + ';';
       case 'CallExpression':
-        const dataObj = node.data;
+        const dataObj = node.data || {};
         const parts = Object.entries(dataObj).map(([k,v])=>{
           if (/^[a-zA-Z_$][a-zA-Z0-9_$]*$/.test(v)) return `${JSON.stringify(k)}: ${v}`;
           return `${JSON.stringify(k)}: ${JSON.stringify(v)}`;
@@ -66,7 +66,7 @@ export function compile(code) {
   return header + gen(ast);
 }
 
-// helper script if run directly
+// CLI helper
 if (process.argv[1].endsWith('compiler.js')) {
   const input = process.argv[2];
   const out = process.argv[3];
