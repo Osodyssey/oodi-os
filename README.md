@@ -89,6 +89,3 @@ npm run build
 - برای production: استفاده از esbuild plugin یا Babel plugin، source-map، تست‌ها و CI را اضافه کن.
 
 ---
-
-اگر خواستی من می‌تونم این پروژه را مستقیماً روی سیستم تو با گسترش بیشتر (Redis برای jti, HTTPS local, esbuild bundling) راه‌اندازی کنم — فقط بگو کدوم گزینه رو می‌خوای.
-
