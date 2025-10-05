@@ -1,0 +1,6 @@
+secret stripe = "stripe"
+
+fn pay(amount) {
+  token = stripe()
+  call "/api/proxy/pay" with { amount: amount, token: token }
+}
