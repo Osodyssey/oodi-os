@@ -1,0 +1,9 @@
+// todo.oodi - نمونه ToDo ساده با Oodi
+
+fn addTask(text) {
+  call "/api/todo/add" with { text: text }
+}
+
+fn listTasks() {
+  call "/api/todo/list" with {}
+}
