@@ -1,0 +1,13 @@
+// ai_full.oodi - نمونه کامل Oodi برای اتصال به AI
+
+secret ai = "ai"
+
+fn askAI(prompt) {
+  token = ai()
+  call "/api/proxy/ai" with { prompt: prompt, token: token }
+}
+
+fn test() {
+  reply = askAI("یک متن کوتاه درباره Oodi بنویس")
+  call "/api/log" with { msg: reply }
+}
